@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { Modal, Box, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
 
-function EditModal({userId, idToEdit, handleCloseEditModal, handleEdit}) {
+function EditAddModal({userId, idToEdit, handleCloseEditModal, handleEdit, showAdd, handleAdd, handleCloseAddModal}) {
 
-  const [editedData, setEditedData] = useState({
+  const [updatedData, setUpdatedData] = useState({
     Name: '',
     Username: '',
     Email: '',
@@ -16,7 +16,7 @@ function EditModal({userId, idToEdit, handleCloseEditModal, handleEdit}) {
   useEffect(() => {
     async function fetchEditedData() {
       try {
-        const response = await fetch(`https://jsonplaceholder.typicode.com/users/${userId}`, {
+        const response = await fetch(`https://jsonplaceholder.typicode.com/users/1`, {
           method: 'GET',
           headers: {
             'Content-type': 'application/json; charset=UTF-8',
@@ -25,14 +25,14 @@ function EditModal({userId, idToEdit, handleCloseEditModal, handleEdit}) {
 
         const data = await response.json();
 
-        setEditedData({
+        setUpdatedData({
           Name: data.name,
           Username: data.username,
           Email: data.email,
-          Address: data.address.street, // Assuming you have nested properties for address
+          Address: data?.address?.street, 
           Phone: data.phone,
           Website: data.website,
-          CompanyName: data.company.name,
+          CompanyName: data?.company?.name,
         });
       } catch (error) {
         console.error('Error fetching user data:', error);
@@ -47,16 +47,16 @@ function EditModal({userId, idToEdit, handleCloseEditModal, handleEdit}) {
       const response = await fetch(`https://jsonplaceholder.typicode.com/users/${userId}`, {
         method: 'PATCH',
         body: JSON.stringify({
-          name: editedData.Name,
-          username: editedData.Username,
-          email: editedData.Email,
+          name: updatedData.Name,
+          username: updatedData.Username,
+          email: updatedData.Email,
           address: {
-            street: editedData.Address, // Assuming you have nested properties for address
+            street: updatedData.Address,
           },
-          phone: editedData.Phone,
-          website: editedData.Website,
+          phone: updatedData.Phone,
+          website: updatedData.Website,
           company: {
-            name: editedData.CompanyName,
+            name: updatedData.CompanyName,
           },
         }),
         headers: {
@@ -64,10 +64,10 @@ function EditModal({userId, idToEdit, handleCloseEditModal, handleEdit}) {
         },
       });
 
-      const updatedData = await response.json();
+      const newData = await response.json();
 
-      // Handle the updated data as needed
-      handleEdit(updatedData);
+      // Handle the new data as needed
+      handleEdit(newData);
 
       // Close the modal
       handleCloseEditModal();
@@ -75,10 +75,46 @@ function EditModal({userId, idToEdit, handleCloseEditModal, handleEdit}) {
       console.error('Error updating user data:', error);
     }
   };
+  let handleAddClick
+  if(!userId){
+     handleAddClick = async () => {
+      try {
+        const response = await fetch(`https://jsonplaceholder.typicode.com/users`, {
+          method: 'POST',
+          body: JSON.stringify({
+            name:updatedData.Name,
+            username:updatedData.Username,
+            email:updatedData.Email,
+            address: {
+              street:updatedData.Address, 
+            },
+            phone:updatedData.Phone,
+            website:updatedData.Website,
+            company: {
+              name:updatedData.CompanyName,
+            },
+          }),
+          headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+          },
+        });
+  
+        const newData = await response.json();
+  
+        // Handle the new data as needed
+        handleAdd(newData);
+  
+        // Close the modal
+        handleCloseAddModal();
+      } catch (error) {
+        console.error('Error updating user data:', error);
+      }
+    };
+  }
     
   return (
     <>
-     <Modal open={Boolean(idToEdit)} onClose={handleCloseEditModal}>
+     <Modal open={Boolean(idToEdit || showAdd)} onClose={idToEdit ? handleCloseEditModal : handleCloseAddModal}>
         <Box
           sx={{
             position: 'absolute',
@@ -96,52 +132,52 @@ function EditModal({userId, idToEdit, handleCloseEditModal, handleEdit}) {
           }}
         >
           <DialogTitle variant='h6' component='h2'>
-           Edit User
+           {idToEdit ? 'Edit User' : 'Add User'}
           </DialogTitle>
           <DialogContent sx={{display: 'flex' ,flexDirection: 'column', width: 750, gap: 1.5}}>
             <TextField
             label="Name"
             fullWidth
-            value={editedData.Name}
-            onChange={(e) => setEditedData({...editedData,Name: e.target.value})} />
+            value={updatedData.Name}
+            onChange={(e) => setUpdatedData({...updatedData,Name: e.target.value})} />
             <TextField
             label="Username"
             fullWidth
-            value={editedData.Username}
-            onChange={(e) => setEditedData({...editedData, Username: e.target.value})} />
+            value={updatedData.Username}
+            onChange={(e) => setUpdatedData({...updatedData, Username: e.target.value})} />
             <TextField
             label="Email"
             fullWidth
-            value={editedData.Email}
-            onChange={(e) => setEditedData({...editedData, Email: e.target.value})} />
+            value={updatedData.Email}
+            onChange={(e) => setUpdatedData({...updatedData, Email: e.target.value})} />
             <TextField
             label="Address"
             fullWidth
-            value={editedData.Address}
-            onChange={(e) => setEditedData({...editedData, Address: e.target.value})} />
+            value={updatedData.Address}
+            onChange={(e) => setUpdatedData({...updatedData, Address: e.target.value})} />
             <TextField
             label="Phone"
             fullWidth
-            value={editedData.Phone}
-            onChange={(e) => setEditedData({...editedData, Phone: e.target.value})} />
+            value={updatedData.Phone}
+            onChange={(e) => setUpdatedData({...updatedData, Phone: e.target.value})} />
             <TextField
             label="Website"
             fullWidth
-            value={editedData.Website}
-            onChange={(e) => setEditedData({...editedData, Website: e.target.value})} />
+            value={updatedData.Website}
+            onChange={(e) => setUpdatedData({...updatedData, Website: e.target.value})} />
             <TextField
             label="Company Name"
             fullWidth
-            value={editedData.CompanyName}
-            onChange={(e) => setEditedData({...editedData, CompanyName: e.target.value})} />
+            value={updatedData.CompanyName}
+            onChange={(e) => setUpdatedData({...updatedData, CompanyName: e.target.value})} />
           </DialogContent>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <DialogActions>
-            <Button onClick={handleCloseEditModal} variant='outlined'>
+            <Button onClick={idToEdit ? handleCloseEditModal : handleCloseAddModal} variant='outlined'>
               Cancel
             </Button>
-            <Button onClick={handleEditClick} variant='contained' color='error'>
-              Edit
+            <Button onClick={idToEdit ? handleEditClick : handleAddClick} variant='contained' color='error'>
+             {idToEdit ? ' Edit' : 'Add'}
             </Button> 
             </DialogActions>
           </Box>
@@ -151,4 +187,4 @@ function EditModal({userId, idToEdit, handleCloseEditModal, handleEdit}) {
   )
 }
 
-export default EditModal
+export default EditAddModal

@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import UserCard from './UserCard';
-import AddModal from '../controlButtons/AddModal';
+import EditAddModal from '../controlButtons/EditModal';
 
 
 function UsersList() {
   const [users, setUsers] = useState([]);
  const [showAdd, setShowAdd] = useState(false);
+ const [loading, setLoading] = useState(true); 
 
   async function getAllUsers(id) {
     try {
@@ -28,6 +29,7 @@ function UsersList() {
         }
       }
       setUsers(usersData);
+      setLoading(false);
     };
 
     fetchData();
@@ -55,16 +57,34 @@ function UsersList() {
 
   return (
     <>
-     <div className='text-right'><button onClick={handleOpenAddModal} className='bg-cyan-200 rounded-md border-[2px] m-2 p-2 shadow-lg
-      border-gray-500'>Add User</button>
-      <AddModal handleCloseAddModal={handleCloseAddModal} handleAdd={handleAdd} showAdd={showAdd}/>
-      </div>
-    <div className='flex flex-wrap justify-center text-left'>
-      {users.map((user, index) => (
-        <UserCard key={index} user={user} deleteUserData={deleteUserData}  editUserData={editUserData}/>
-        
-      ))}
-      </div>
+    {loading ? (
+        <h1 className='font-bold text-5xl'>Loading...</h1>
+      ) : (
+        <>
+          <div className='text-right'>
+            <button
+              onClick={handleOpenAddModal}
+              className='bg-cyan-200 rounded-md border-[2px] m-2 p-2 shadow-lg border-gray-500'>
+              Add User
+            </button>
+            <EditAddModal
+              handleCloseAddModal={handleCloseAddModal}
+              handleAdd={handleAdd}
+              showAdd={showAdd}
+            />
+          </div>
+          <div className='flex flex-wrap justify-center text-left'>
+            {users.map((user, index) => (
+              <UserCard
+                key={index}
+                user={user}
+                deleteUserData={deleteUserData}
+                editUserData={editUserData}
+              />
+            ))}
+          </div>
+        </>
+      )}
     </>
   );
 }

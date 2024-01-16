@@ -29,8 +29,6 @@ function Comments() {
   return (
     <>
      <h1 className='font-bold text-3xl inline-block text-center'> Comments </h1>
-     <div className='text-right inline-block'><button className='bg-cyan-200 rounded-md border-[2px] m-2 p-2 shadow-lg
-      border-gray-500'>Add Comment</button></div>
           {comments.map((comment) => (
             <div key={comment.id} className='bg-cyan-100 rounded-lg border-[1px] border-black text-left
              m-3 p-4 shadow-lg font-medium'>

@@ -29,8 +29,6 @@ function Photos() {
   return (
     <>
         <h1 className='font-bold text-3xl inline'> Photos </h1>
-        <div className='text-right inline'><button className='bg-cyan-200 rounded-md border-[2px] m-2 p-2 shadow-lg
-      border-gray-500'>Add Photo</button></div>
        <div className='flex flex-wrap'>
           {photos.map((photo) => (
             <div key={photo.id} className='bg-cyan-100 rounded-lg  border-black text-left

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import DeleteModal from '../controlButtons/DeleteModal';
-import EditModal from '../controlButtons/EditModal';
+import EditAddModal from '../controlButtons/EditModal';
 
 function UserCard({user,key,deleteUserData, editUserData}) {
  
@@ -9,22 +9,20 @@ function UserCard({user,key,deleteUserData, editUserData}) {
   const [idToEdit, setIdToEdit] = useState(false)
   
   const handleOpenDeleteModal = () => {
-    setIdToDelete(true)
-  }
-  const handleCloseDeleteModal = () => {
-    setIdToDelete(false)
-  }
+    setIdToDelete(true);
+  };
 
- 
-  const handleDelete = () => {
+  const handleCloseDeleteModal = () => {
+    setIdToDelete(false);
+  };
+  const handleDelete = async () => {
     if (user && user.id) {
-      deleteUserData(user.id);
+     await deleteUserData(user.id);
       setIdToDelete(false);
+    } else {
+      console.log("Error code");
     }
-    else {
-      console.log("Error code")
-    }
-  }
+  };
 
   const handleOpenEditModal = () => {
     setIdToEdit(true)
@@ -44,11 +42,13 @@ function UserCard({user,key,deleteUserData, editUserData}) {
     <>
     <div className=' border-[1px] border-black rounded-lg h-[400px] w-[300px] bg-cyan-100 m-4 shadow-xl ' >
        <div className='flex justify-end'> <button className='mx-4' onClick={handleOpenEditModal}>✏️</button>
-       {<EditModal idToEdit={idToEdit} handleCloseEditModal={handleCloseEditModal}
+       {<EditAddModal idToEdit={idToEdit} handleCloseEditModal={handleCloseEditModal}
         handleEdit={handleEdit} userId={user.id}/>}
-        <button className='mx-4 m'onClick={ handleOpenDeleteModal}> ❌</button>
-        {<DeleteModal idToDelete={idToDelete} handleCloseDeleteModal={handleCloseDeleteModal}
-         handleDelete={handleDelete}/>}
+        <button className='mx-4 m' onClick={handleOpenDeleteModal}> ❌</button>
+        {<DeleteModal 
+        idToDelete={idToDelete}
+        handleCloseDeleteModal={handleCloseDeleteModal}
+        handleDelete={handleDelete}/>}
         </div>
        <Link to={{
       pathname: `/userpage/${user.id}`,

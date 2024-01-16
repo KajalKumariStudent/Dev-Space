@@ -24,9 +24,6 @@ function App() {
       <Route path='/' element= {<Layout/>}>
       <Route path='' element={<UsersList/>}/>
        <Route path='usercard' element= {<UserCard/>}/> 
-       {/* <Route path='posts' element= {<Posts/>}>
-       <Route path=':postId/comments' element = {<Comments/>}/>
-       </Route> */}
        <Route path="posts" element={<Posts />} />
        <Route path="posts/:postId/comments" element={<Comments />} />
      <Route path='userpage/:userId' element= {<UserPage/>} />

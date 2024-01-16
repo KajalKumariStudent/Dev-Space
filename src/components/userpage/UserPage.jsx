@@ -1,13 +1,22 @@
 import React, { useEffect, useState } from 'react';
 import { useParams,Link } from 'react-router-dom';
 import { Tab, Tabs, Box } from '@mui/material';
-
+import EditAddPostModal from '../controlButtons/EditAddPostModal';
+import DeleteAlbumOrPost from '../controlButtons/DeleteAlbumorPost';
+import EditAddAlbumModal from '../controlButtons/EditAddAlbumModal';
 
 function UserPage() {
   const [value, setValue] = useState(1);
   const [user, setUser] = useState({});
   const [posts, setPosts] = useState([]);
   const [albums, setAlbums] = useState([]);
+  const [idToEdit,setIdToEdit] = useState(false); 
+  const [idToDelete, setIdToDelete] = useState(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedAlbumId, setSelectedAlbumId] = useState(null);
+
   const { userId } = useParams();
 
   const getRandomTime = () => {
@@ -61,7 +70,54 @@ function UserPage() {
   }, [userId]);
 
   const handleChange = (event, newValue) => setValue(newValue);
+  const handleOpenEditPostModal = (postId) => {
+    setSelectedPostId(postId);
+    setIdToEdit(true);
+  };
 
+  const handleCloseEditPostModal = () => setIdToEdit(false);
+
+  const handleEditedPost = (editedPost) => {
+    setPosts((prevPosts) =>prevPosts.map((post) => post.id === editedPost.id ? editedPost: post) )
+    handleCloseEditPostModal()
+  }
+
+  const handleOpenDeletePostModal = (postId) =>{
+   setIsDeleteModalOpen(true);
+   setIdToDelete(postId)
+  }
+  
+  const handleOpenAddPostModal = () => setShowAdd(true);
+
+  const handleCloseAddPostModal = () => setShowAdd(false);
+
+  const handleAddPost = (newPost) => {
+    setPosts((prevPosts) =>[...prevPosts, newPost])
+    handleCloseAddPostModal()
+}
+const handleOpenEditAlbumModal = (postId) => {
+  setSelectedAlbumId(postId);
+  setIdToEdit(true);
+};
+const handleCloseEditAlbumModal = () => setIdToEdit(false);
+
+const handleAlbum = (editedAlbum) => {
+  setAlbums((prevAlbums) =>prevAlbums.map((album) => album.id === editedAlbum.id ? editedAlbum: album) )
+  handleCloseEditAlbumModal()
+}
+const handleOpenDeleteAlbumModal = (postId) =>{
+  setIsDeleteModalOpen(true);
+  setIdToDelete(postId)
+ }
+
+const handleOpenAddAlbumModal = () => setShowAdd(true);
+
+const handleCloseAddAlbumModal = () => setShowAdd(false);
+
+const handleAddAlbum = (newAlbum) => {
+  setAlbums((prevAlbums) =>[...prevAlbums, newAlbum])
+  handleCloseAddAlbumModal()
+}
   return (
     <>
     <div className='bg-cyan-50 rounded-lg border-[1px] text-left
@@ -90,20 +146,42 @@ function UserPage() {
 
       {value === 1 && (
         <div>
-            <div className='text-right'><button className='bg-cyan-200 rounded-md border-[2px] m-2 p-2 
-         shadow-lg border-gray-500 '>Add post</button></div>
+            <div onClick={handleOpenAddPostModal} className='text-right'><button className='bg-cyan-200 rounded-md border-[2px] m-2 p-2 
+         shadow-lg border-gray-500 '>Add post</button>
+         <EditAddPostModal 
+          handleCloseAddModal={handleCloseAddPostModal} 
+          handleAdd={handleAddPost} 
+          showAdd={showAdd}/>
+         </div>
+         <EditAddPostModal
+         handleCloseEditModal={handleCloseEditPostModal}
+         handleEdit={handleEditedPost}
+         idToEdit={idToEdit} 
+         postId={selectedPostId}/>
+         <DeleteAlbumOrPost isDeleteModalOpen={isDeleteModalOpen}
+           setIsDeleteModalOpen={setIsDeleteModalOpen} 
+           setAllPostsOrAlbumsData={setPosts}
+           idToDelete={idToDelete} setIdToDelete={setIdToDelete}/>
           {posts.map((post) => (
             <div key={post.id} className='bg-cyan-100 rounded-lg border-[1px] border-black text-left
              m-3 p-4 shadow-lg font-medium'>
+             <div className='inline mr-48'>Id : <span className='font-normal'> {post.id}</span> </div> 
+             <div className='inline-flex justify-end ml-40'>
+                 <button 
+                 onClick={() => handleOpenEditPostModal(post.id)}
+                  className='mr-4 ml-[38rem]' >✏️</button>
+              
+              <button onClick={() => handleOpenDeletePostModal(post.id)}className='mx-4 '> ❌</button>
+             
+              </div>
               <Link to={{
                pathname : `/posts/${post.id}/comments`
               }}>
-              <div>Id : {post.id} </div>
-              <h3>Title : {post.title}</h3>
-              <p>Body : {post.body}</p>
-              <p className='font-normal'>Date : {getRandomTime().toLocaleDateString()}</p>
-              <p className='font-normal'>Time : {getRandomTime().toLocaleTimeString([],
-                { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
+              <h3>Title : <span className='font-normal'>{post.title}</span></h3>
+              <p>Body : <span  className='font-normal'>{post.body}</span></p>
+              <p >Date : <span className='font-normal'>{getRandomTime().toLocaleDateString()}</span></p>
+              <p >Time : <span className='font-normal'>{getRandomTime().toLocaleTimeString([],
+                { hour: '2-digit', minute: '2-digit', hour12: true })}</span></p>
             </Link>
             </div>
           ))}
@@ -112,20 +190,37 @@ function UserPage() {
 
       {value === 2 && (
         <div >
-         <div className='text-right'><button className='bg-cyan-200 rounded-md border-[2px] m-2 p-2 
+         <div className='text-right'><button onClick={handleOpenAddAlbumModal} className='bg-cyan-200 rounded-md border-[2px] m-2 p-2 
          shadow-lg border-gray-500 '>Add Album</button></div> 
+          <EditAddAlbumModal 
+      handleOpenAddModal={handleOpenAddAlbumModal} handleAdd={handleAddAlbum} showAdd={showAdd} />
+       <EditAddAlbumModal 
+      albumId={selectedAlbumId} handleEdit={handleAlbum}  idToEdit={idToEdit} handleCloseEditModal={handleCloseEditAlbumModal}/>
+         <DeleteAlbumOrPost isDeleteModalOpen={isDeleteModalOpen}
+           setIsDeleteModalOpen={setIsDeleteModalOpen} 
+           setAllPostsOrAlbumsData={setAlbums}
+           idToDelete={idToDelete} setIdToDelete={setIdToDelete}/> 
           {albums.map((album) => (
             <div key={album.id} className='bg-cyan-100 rounded-lg border-[1px] border-black text-left
             m-3 p-4 shadow-lg font-medium'>
-              <Link to={{
-               pathname : `/albums/${album.id}/photos`
+              <div className='inline'>id : {album.id} </div>
+             <div className='inline-flex justify-end '> 
+             <button onClick={() => handleOpenEditAlbumModal(album.id)} className='ml-[57rem] mr-8' >✏️</button>
+             <button onClick={() => handleOpenDeleteAlbumModal(album.id)} className='mx-4 m'> ❌</button>
+            
+             </div>
+             <div>
+             <Link to={{
+              pathname : `/albums/${album.id}/photos`
              }}>
-              <div>id : {album.id} </div>
+              <div className='inline'>UserId : {album.userId}</div>
               <h3>Title : {album.title}</h3>
-              <p className='font-normal'>Date : {getRandomTime().toLocaleDateString()}</p>
-              <p className='font-normal'>Time : {getRandomTime().toLocaleTimeString([],
-                { hour: '2-digit', minute: '2-digit', hour12: true })}</p>
-             </Link>
+             <div>Date :  <span className='font-normal'>{getRandomTime().toLocaleDateString()}</span></div>
+              <div>Time : <span className='font-normal'>{getRandomTime().toLocaleTimeString([],
+                { hour: '2-digit', minute: '2-digit', hour12: true })}</span></div>
+            </Link>
+            </div>
+            
             </div>
           ))}
         </div>

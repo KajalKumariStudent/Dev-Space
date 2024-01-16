@@ -1,11 +1,30 @@
-import React, { useEffect } from "react";
-import { Modal, Box, Typography, Button } from "@mui/material";
+import React from 'react';
+import { Modal, Box, Typography, Button } from '@mui/material';
 
 
-function DeleteModal ({idToDelete, handleCloseDeleteModal, handleDelete}) {
-  
-return (
-<Modal open={Boolean(idToDelete)} onClose={handleCloseDeleteModal}>
+const DeleteAlbumOrPost = ({
+    isDeleteModalOpen,
+    setIsDeleteModalOpen,
+    setAllPostsOrAlbumsData,
+    idToDelete,
+    setIdToDelete,
+  }) => {
+    
+   const handleCloseDeleteModal = () => {
+    setIdToDelete(null);
+    setIsDeleteModalOpen(false);
+  };
+
+  const handleDelete = () => {
+    setAllPostsOrAlbumsData((prevData) =>
+      prevData.filter((data) => data.id !== idToDelete)
+    );
+
+    handleCloseDeleteModal();
+  };
+  return (
+    <>
+      <Modal open={isDeleteModalOpen} onClose={handleCloseDeleteModal}>
         <Box
           sx={{
             position: 'absolute',
@@ -22,10 +41,10 @@ return (
             gap: 3,
           }}
         >
-          <Typography variant='h6' component='h2'>
+         <Typography variant='h6' component='h2'>
             Confirm Delete
           </Typography>
-          <Typography>Are you sure you want to delete?</Typography>
+          <Typography>Are you sure you want to delete this user?</Typography>
           <Box sx={{ display: 'flex', gap: 1 }}>
             <Button onClick={handleCloseDeleteModal} variant='outlined'>
               Cancel
@@ -36,6 +55,9 @@ return (
           </Box>
         </Box>
       </Modal>
-      )};
+    </>
+  );
+}
 
-      export default DeleteModal
+
+export default DeleteAlbumOrPost
